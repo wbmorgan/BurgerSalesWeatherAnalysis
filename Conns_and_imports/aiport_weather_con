@@ -1,0 +1,76 @@
+import psycopg2
+import pandas as pd
+
+# Database connection parameters for PostgreSQL
+db_params = {
+    "host": "localhost",
+    "database": "fgsales",
+    "user": "postgres",
+    "password": "postgres"
+}
+
+# Load the CSV file using pandas
+csv_file_path = '/Users/willb-m/Desktop/FIve Guys Sales Data/weather_data.csv'
+df = pd.read_csv(csv_file_path)
+
+# Convert the date column from DD/MM/YYYY to YYYY-MM-DD format
+df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y').dt.strftime('%Y-%m-%d')
+
+# Replace 'NaN' or any string 'NaN' with actual NaN values that PostgreSQL understands
+df = df.replace('NaN', None)
+
+# Connect to PostgreSQL
+try:
+    conn = psycopg2.connect(**db_params)
+    cur = conn.cursor()
+    print("Connected to the PostgreSQL database successfully.")
+
+    # Create the table (if it doesn't exist)
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS edinburgh_forecasts_2023 (
+        date DATE,             -- Date column
+        tavg FLOAT,            -- Average temperature
+        tmin FLOAT,            -- Minimum temperature
+        tmax INTEGER,          -- Maximum temperature
+        prcp FLOAT,            -- Precipitation
+        snow FLOAT,            -- Snow
+        wdir INTEGER,          -- Wind direction
+        wspd FLOAT,            -- Wind speed
+        wpgt FLOAT,            -- Wind gust
+        pres FLOAT,            -- Pressure
+        tsun FLOAT             -- Sunshine duration
+    );
+    """
+    cur.execute(create_table_query)
+    conn.commit()
+    print("Table created successfully.")
+
+ # Insert data from DataFrame into PostgreSQL table
+    for index, row in df.iterrows():
+        insert_query = """
+        INSERT INTO edinburgh_forecasts_2023 (date, tavg, tmin, tmax, prcp, snow, wdir, wspd, wpgt, pres, tsun)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """
+        cur.execute(insert_query, (
+            row['date'],         # Assuming column names in DataFrame match those in table
+            row['tavg'],
+            row['tmin'],
+            row['tmax'],
+            row['prcp'],
+            row['snow'],
+            row['wdir'],
+            row['wspd'],
+            row['wpgt'],
+            row['pres'],
+            row['tsun']
+        ))
+        conn.commit()  # Add this line to ensure data is committed after each insert
+
+except psycopg2.Error as e:
+    print(f"Error: {e}")
+
+finally:
+    if conn:
+        cur.close()
+        conn.close()
+        print("PostgreSQL connection closed.")
