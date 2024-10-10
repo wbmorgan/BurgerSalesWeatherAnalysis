@@ -64,7 +64,10 @@ We can see that slightly higher sales are shown in the upper bounds of severity.
 | ANOVA (Day Sales)                   | F-statistic = 0.80         | 0.55011   |
 | ANOVA (Night Sales)                 | F-statistic = 0.70         | 0.62600   |
 
-The correlations are weak from direct results, and the ANOVA results show little significant impact of weather severity on sales, however from the weighted averages it shows some relationship, which is contradictory.
+The correlations are weak from direct results, and the ANOVA results show little significant impact of weather severity on sales, however from the weighted averages it shows some relationship (especially with the day sales) which is contradictory.
+
+![Graph]([https://github.com/yourusername/yourrepository/blob/main/graph.png](https://github.com/wbmorgan/Burger_sales/blob/main/Weather_models/Severity_open.png))
+![Graph]([https://github.com/yourusername/yourrepository/blob/main/graph.png](https://github.com/wbmorgan/Burger_sales/blob/main/Weather_models/Severity_close.png))
 
 ## Visualizations
 Explain the key graphs and visualizations (you can add screenshots of your Power BI visualizations here as well).
