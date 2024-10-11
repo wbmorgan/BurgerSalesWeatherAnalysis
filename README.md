@@ -65,11 +65,14 @@ We can see that slightly higher sales are shown in the upper bounds of severity.
 | ANOVA (Night Sales)                 | F-statistic = 0.70         | 0.62600   |
 
 The correlations are weak from direct results, and the ANOVA results show little significant impact of weather severity on sales, however from the weighted averages it shows some relationship (especially with the day sales) which is contradictory.
-
+This could mean that there is a non linear rationship between weather and sales.
 <div style="display: flex; justify-content: space-around;">
   <img src="https://github.com/wbmorgan/Burger_sales/blob/main/Weather_models/Severity_open.png?raw=true" alt="Severity Open" width="800" />
   <img src="https://github.com/wbmorgan/Burger_sales/blob/main/Weather_models/Severity_close.png?raw=true" alt="Severity Close" width="800" />
 </div>
+
+
+
 
 #Next talk about the relationship between 2023 and 2024 sales and link into how to use it with machine learning (+events and holiday results)
 
