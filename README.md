@@ -3,20 +3,21 @@
 ## Project Overview
 In a personal endeavour to learn about time series analysis and forecasting, and using Python on real-life data I decided to do a project on Five Guys Sales data at my local branch. 
 
-The managers were struggling to predict sales based on 7-day lag, and due to this were making constant losses due to over/undershooting in inventory orders, so created this project to see if there was a way to predict this more accurately.
+The management team faced significant challenges in predicting sales based on a 7-day lag, leading to frequent financial losses due to inaccurate inventory orders.
 
-After talking to staff and management, I thought the main factors of how busy the store got were as follows:
+To tackle this I aimed to develop a more reliable forecasting method. After engaging in discussions with both staff and management, I identified the primary factors influencing store traffic as follows:
+
 
 - Weather Patterns (Temperature, Precipitation, Wind, etc)
 - Popular local events (Football, Rugby, Concerts)
 - Public Holidays
 
-This analysis mostly asses the influence of weather on Sales.
+This analysis mostly assesses the influence of weather on Sales.
 
 ## Data Sources
-I created a PostgreSQL database to store and access the data. I used Excel to store and digitalise two years' worth of analogue sales data and connected to weather API's (WorldWeatherOnline, MetOffice Datapoint) to get local historical weather data. 
+I created a PostgreSQL database to store and access the data. I used Excel to store and digitalise two years' worth of analogue sales data and connected to weather APIs (WorldWeatherOnline, MetOffice Datapoint) to get local historical weather data. 
 
-I used the sales data and analysed it with various weather conditions and aimed to use this, along with the effect of Local events and holidays to analyse the effect and eventually use it the predict future Sales.
+I used the sales data and analysed it with various weather conditions and aimed to use this, along with the effect of Local events and holidays to analyse the effect and eventually use it to predict future Sales.
 ## Methodology
 -  Upload data from Excel sheets to PostgreSQL and import API to the database using Python. 
 - Data extraction from PostgreSQL
@@ -25,9 +26,8 @@ I used the sales data and analysed it with various weather conditions and aimed 
 - Forecasting using RandomForest Regression using main factors in feature engineering 
 
 ## Results
-Discuss the key results of your analysis. You can summarize the findings from the graphs and analysis here.
 
-I found that weather had some influence on sales but only on certain metrics.
+I found that weather influenced sales but only on certain metrics.
 
 ## Correlation Table
 
@@ -38,7 +38,7 @@ I found that weather had some influence on sales but only on certain metrics.
 | wspd (Wind Speed)        | -0.0427                  |
 | tavg (Average Temperature)| -0.0646                  |
 
-This was using Met Office Daily data, but I wanted to get more accurate data in a shorter time frame than 24h so I used an API to check weather conditions with both Day and Night Sales.
+This was using Met Office Daily data, but I wanted to get more accurate data in a shorter time frame than 24 hours so I used an API to check weather conditions with both Day and Night Sales.
 
 I drew a map to use weather conditions by weather severity (1 = Clear, 9 = Storm/Thunderstorm) and looked at the weighted averages (to offset the effect of count)
 
@@ -66,8 +66,10 @@ We can see that slightly higher sales are shown in the upper bounds of severity.
 
 The correlations are weak from direct results, and the ANOVA results show little significant impact of weather severity on sales, however from the weighted averages it shows some relationship (especially with the day sales) which is contradictory.
 
-![Graph]([https://github.com/yourusername/yourrepository/blob/main/graph.png](https://github.com/wbmorgan/Burger_sales/blob/main/Weather_models/Severity_open.png))
-![Graph]([https://github.com/yourusername/yourrepository/blob/main/graph.png](https://github.com/wbmorgan/Burger_sales/blob/main/Weather_models/Severity_close.png))
+<div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/wbmorgan/Burger_sales/blob/main/Weather_models/Severity_open.png?raw=true" alt="Severity Open" width="800" />
+  <img src="https://github.com/wbmorgan/Burger_sales/blob/main/Weather_models/Severity_close.png?raw=true" alt="Severity Close" width="800" />
+</div>
 
-## Visualizations
-Explain the key graphs and visualizations (you can add screenshots of your Power BI visualizations here as well).
+#Next talk about the relationship between 2023 and 2024 sales and link into how to use it with machine learning (+events and holiday results)
+
