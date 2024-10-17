@@ -188,4 +188,6 @@ fig = go.Figure()
 fig.add_trace(go.Scatter(x=X_test['date'], y=y_test, mode='lines', name='Actual Sales'))
 fig.add_trace(go.Scatter(x=X_test['date'], y=y_pred, mode='lines', name='Predicted Sales'))
 fig.update_layout(title='Actual vs Predicted Sales', xaxis_title='Date', yaxis_title='Sales')
+fig.write_image('SalesForecast.png')
+
 fig.show()
