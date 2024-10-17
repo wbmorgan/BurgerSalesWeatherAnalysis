@@ -8,9 +8,14 @@ import psycopg2
 api_key = '70b92de967654084863154611242409'
 base_url = 'https://api.worldweatheronline.com/premium/v1/past-weather.ashx'
 
-# Define the location and year
+import requests
+import json
+import psycopg2
+from datetime import datetime, timedelta
+import time
+
+# Define the location
 location = 'Edinburgh, United Kingdom'
-year = 2023
 
 # Database connection details
 db_config = {
@@ -50,23 +55,35 @@ def insert_weather_data(cursor, day, location):
         time = int(hourly['time']) // 100  # Convert 'time' from 'hmm' to 'h'
         date_time = f"{date} {time}:00:00"
         
+        # Check if the record already exists
         cursor.execute(
-            """
-            INSERT INTO weather_data_6hr (date, tempC, tempF, humidity, windspeedMiles, windspeedKmph, weather_desc, location, raw_data)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """,
-            (
-                date_time,
-                int(hourly['tempC']),
-                int(hourly['tempF']),
-                int(hourly['humidity']),
-                int(hourly['windspeedMiles']),
-                int(hourly['windspeedKmph']),
-                hourly['weatherDesc'][0]['value'],
-                location,
-                json.dumps(hourly)  # Store the raw JSON data
-            )
+            "SELECT EXISTS(SELECT 1 FROM weather_data_6hr WHERE date = %s AND location = %s)",
+            (date_time, location)
         )
+        exists = cursor.fetchone()[0]
+        
+        if not exists:
+            cursor.execute(
+                """
+                INSERT INTO weather_data_6hr (date, tempC, tempF, humidity, windspeedMiles, windspeedKmph, weather_desc, location, raw_data)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    date_time,
+                    int(hourly['tempC']),
+                    int(hourly['tempF']),
+                    int(hourly['humidity']),
+                    int(hourly['windspeedMiles']),
+                    int(hourly['windspeedKmph']),
+                    hourly['weatherDesc'][0]['value'],
+                    location,
+                    json.dumps(hourly)  # Store the raw JSON data
+                )
+            )
+            print(f"Inserted data for {date_time}.")
+        else:
+            print(f"Data for {date_time} already exists, skipping insertion.")
+
 
 # Establish a connection to the PostgreSQL database
 try:
@@ -96,9 +113,9 @@ except Exception as e:
     print(f"Error connecting to the database: {e}")
     exit()
 
-# Collect data for each day of the year
-start_date = datetime(year, 1, 1)
-end_date = datetime(year, 12, 31)
+# Collect data from 2023 until today
+start_date = datetime(2024, 1, 1)
+end_date = datetime.now()
 
 current_date = start_date
 while current_date <= end_date:
@@ -120,5 +137,6 @@ while current_date <= end_date:
 # Close the database connection
 cursor.close()
 connection.close()
-print("Database connection closed.")
+print("Database connection closed.") 
+
 

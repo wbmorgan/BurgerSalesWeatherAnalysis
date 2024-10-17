@@ -4,6 +4,8 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt  
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+import os
+import numpy as np
 
 
 # Database connection params for PostgreSQL
@@ -13,6 +15,10 @@ db_params = {
     "user": "postgres",
     "password": "postgres"
 }
+
+# Create output directory if it doesn't exist
+output_directory = "/Users/willb-m/Desktop/output_files/"
+os.makedirs(output_directory, exist_ok=True)
 
 # Connect to PostgreSQL
 try:
@@ -75,6 +81,7 @@ try:
     print("Correlation between 'total_day' and 'wspd':", corrwspd)
     print("Correlation between 'total_day' and 'tavg':", corrtavg)
 
+    
 
     # Plot data for precipitation
     
@@ -112,45 +119,11 @@ try:
         yaxis=dict(title='Precipitation', side='left'),  # Left y-axis for temperature
         yaxis2=dict(title='Sales (£)', side='right', overlaying='y'),  # Right y-axis for sales
         hovermode='x',
-        template='plotly_white'
+        template='plotly_white'        
     )
+    fig.write_html(os.path.join(output_directory, 'precipitation_sales_plot.png'))
 
     fig.show()
-
-
-    # Prepare the data for quadratic regression
-    X = df[['prcp']].values
-    y = df['total_day'].values
-
-    # Create polynomial features (quadratic)
-    poly = PolynomialFeatures(degree=2)
-    X_poly = poly.fit_transform(X)
-
-    # Fit the quadratic regression model
-    model = LinearRegression()
-    model.fit(X_poly, y)
-
-    # Predict values using the quadratic model
-    y_pred = model.predict(X_poly)
-
-    # Plot the results
-    plt.scatter(df['prcp'], df['total_day'], color='blue', label='Data')
-    plt.plot(df['prcp'], y_pred, color='red', label='Quadratic Fit')
-    plt.title('Sales vs Precipitation (Quadratic Regression)')
-    plt.xlabel('Precipitation (mm)')
-    plt.ylabel('Sales (£)')
-    plt.legend()
-    plt.show()
-
-    # Coefficients of the model (for interpretation)
-    print("Quadratic coefficients:", model.coef_)
-
-
-
-
-
-
-
 
     #Plot for avg Wind gust
 
@@ -165,7 +138,7 @@ try:
         line=dict(color='blue'),
         hovertemplate='Date: %{x}<br>Wind Gusts: %{y:.2f}<extra></extra>',
         yaxis='y1'  # Primary y-axis
-    ))
+    )) 
 
     # Add sales line plot with the secondary y-axis
     fig.add_trace(go.Scatter(
@@ -188,7 +161,7 @@ try:
         hovermode='x',
         template='plotly_white'
     )
-
+    fig.write_html(os.path.join(output_directory, 'gust_sales_plot.png'))
     fig.show()
 
     #Plot for Wind Speed
@@ -227,7 +200,7 @@ try:
         hovermode='x',
         template='plotly_white'
     )
-
+    fig.write_html(os.path.join(output_directory, 'wspd_sales_plot.png'))
     fig.show()
 
     #Plot for avg temperature
@@ -265,7 +238,7 @@ try:
         hovermode='x',
         template='plotly_white'
     )
-
+    fig.write_html(os.path.join(output_directory, 'temp_sales_plot.png'))
     fig.show()
 
 
@@ -294,14 +267,50 @@ try:
         yaxis=dict(range=[-1, 1]),  # Set y-axis to range from -1 to 1 to reflect correlation bounds
         template='plotly_white'
     )
-
+    fig.write_html(os.path.join(output_directory, 'weatherfactor_sales_plot.png'))
     # Show the plot
     fig.show()
 
 
 
+    # Prepare the data for quadratic regression
+    X = df[['prcp']].values
+    y = df['total_day'].values
 
+    # Create polynomial features (quadratic)
+    poly = PolynomialFeatures(degree=2)
+    X_poly = poly.fit_transform(X)
 
+    # Fit the quadratic regression model
+    model = LinearRegression()
+    model.fit(X_poly, y)
+
+    # Predict values using the quadratic model
+    y_pred = model.predict(X_poly)
+
+    # Plot the results
+    plt.scatter(df['prcp'], df['total_day'], color='blue', label='Data')
+    plt.plot(df['prcp'], y_pred, color='red', label='Quadratic Fit')
+    plt.title('Sales vs Precipitation (Quadratic Regression)')
+    plt.savefig(os.path.join(output_directory, 'sales_vs_precipitation.png'))  # Save Matplotlib figure as PNG
+    plt.xlabel('Precipitation (mm)')
+    plt.ylabel('Sales (£)')
+    plt.legend()
+    plt.show()
+    plt.close()  # Close the plot to free memory
+
+    # Coefficients of the model (for interpretation)
+    intercept = model.intercept_
+    linear_coeff = model.coef_[1]  # Coefficient for linear term
+    quadratic_coeff = model.coef_[2]  # Coefficient for quadratic term
+
+    # Create a DataFrame to save the results
+    results_df = pd.DataFrame({
+        'Value': [intercept, linear_coeff, quadratic_coeff, corrprcp, corrwpgt, corrwspd, corrtavg]
+    }, index=['Intercept', 'Linear Coefficient', 'Quadratic Coefficient', 'Precipitation Correlation', 'Wind Gust Correlation', 'Wind Speed Correlation', 'Avg Temp Correlation'])
+
+    # Save results to CSV
+    results_df.to_csv(os.path.join(output_directory, 'regression_results.csv'))
 
 
 

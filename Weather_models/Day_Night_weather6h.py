@@ -2,6 +2,7 @@ import psycopg2
 import pandas as pd
 import plotly.graph_objects as go
 from scipy import stats
+import os
 
 # Database connection params for PostgreSQL
 db_params = {
@@ -10,6 +11,10 @@ db_params = {
     "user": "postgres",
     "password": "postgres"
 }
+
+# Create output directory if it doesn't exist
+output_directory = "/Users/willb-m/Desktop/output_files/"
+os.makedirs(output_directory, exist_ok=True)
 
 # Define the severity scale for weather descriptions
 severity_map = {
@@ -141,6 +146,7 @@ try:
             )
         ]
     )
+    fig.write_image(os.path.join(output_directory, 'Severity_open.png'))
 
     fig.show()
 
@@ -192,7 +198,7 @@ try:
             )
         ]
     )
-
+    fig.write_image(os.path.join(output_directory, 'Severity_close.png'))
     fig.show()
 
     # Correlation between severity and sales
@@ -206,6 +212,8 @@ try:
     print(f'ANOVA result for day: F-statistic = {anova_result.statistic:.2f}, p-value = {anova_result.pvalue:.5f}')
     anova_result = stats.f_oneway(*[df['sales_close'][df['severity'] == sev].dropna() for sev in df['severity'].unique()])
     print(f'ANOVA result for night: F-statistic = {anova_result.statistic:.2f}, p-value = {anova_result.pvalue:.5f}')
+
+
 
 except psycopg2.Error as e:
     print(f'Error: {e}')
